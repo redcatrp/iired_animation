@@ -4,19 +4,19 @@ Config.groups = {
     {
         -- name = "Emotes",
         actions = {
-            {"Dire au revoir", -339257980},
-            {"Chapeau bas", -1457020913},
-            {"Hochez la tête", -822629770},
-            {"cracher", -2106738342}
+            {"Winken", -339257980},
+            {"Hut ziehen", -1457020913},
+            {"Nicken", -822629770},
+            {"Spucken", -2106738342}
         }
         -- prompt_group
     },
     {
         -- name = "Emotes",
         actions = {
-            {"Suivez-moi", 1115379199},
-            {"Apontar", 486225122},
-            {"Mandar Biejo", 1927505461},
+            {"Folge mir", 1115379199},
+            {"Zeigen", 486225122},
+            {"Kuss", 1927505461},
             {"HissyFit", 796723886}
         }
         -- prompt_group
@@ -51,7 +51,7 @@ Controll = {
 
 
 language = { --traduire le menu -- translate the menu
-    next = "Suivant",
-    close = "Fermer",
-    back = "retour",
+    next = "Weiter",
+    close = "Schließen",
+    back = "Zurück",
 }
