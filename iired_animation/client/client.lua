@@ -1,4 +1,108 @@
 
+Citizen.CreateThread( --lever les mains -- raise your hands 
+    function()
+        while true do
+            Citizen.Wait(0)
+            if IsControlJustPressed(0, 0x9959A6F0) then -- C 
+                local playerPed = PlayerPedId()
+                if not IsEntityDead(playerPed) and not Citizen.InvokeNative(0x9682F850056C9ADE, playerPed) then
+                    local animDict = "script_proc@robberies@homestead@lonnies_shack@deception"
+
+                    if not IsEntityPlayingAnim(playerPed, animDict, "hands_up_loop", 3) then
+                        if not HasAnimDictLoaded(animDict) then
+                            RequestAnimDict(animDict)
+
+                            while not HasAnimDictLoaded(animDict) do
+                                Citizen.Wait(0)
+                            end
+                        end
+
+                        TaskPlayAnim(playerPed, animDict, "hands_up_loop", 2.0, -2.0, -1, 67109393, 0.0, false, 1245184, false, "UpperbodyFixup_filter", false)
+
+                        RequestAnimDict(animDict)
+                    else
+                        -- ClearPedTasks(playerPed)
+                        ClearPedSecondaryTask(playerPed)
+                    end
+                end
+            end
+        end
+    end
+)
+-- Citizen.CreateThread(function()
+--     while true do
+--         Citizen.Wait(0)
+--         if (IsControlJustPressed(0, Controll.Toggle))  then
+
+--             local ped = PlayerPedId()
+--             if ( DoesEntityExist( ped ) and not IsEntityDead( ped ) ) then
+    
+--                 RequestAnimDict( "script_proc@robberies@shop@rhodes@gunsmith@inside_upstairs" )
+    
+--                 while ( not HasAnimDictLoaded( "script_proc@robberies@shop@rhodes@gunsmith@inside_upstairs" ) ) do 
+--                     Citizen.Wait( 100 )
+--                 end
+    
+--                 if IsEntityPlayingAnim(ped, "script_proc@robberies@shop@rhodes@gunsmith@inside_upstairs", "handsup_register_owner", 3) then
+--                     ClearPedSecondaryTask(ped)
+--                 else
+--                     TaskPlayAnim(ped, "script_proc@robberies@shop@rhodes@gunsmith@inside_upstairs", "handsup_register_owner", 8.0, -8.0, 120000, 31, 0, true, 0, false, 0, false)
+--                 end
+--             end
+--         end
+--     end
+-- end)
+
+local Ragdoll = false
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        local Player = PlayerPedId()
+        
+        if not CanPedRagdoll(Player) or IsEntityDead(Player) or IsPedInAnyVehicle(Player, true) then
+            Ragdoll = false
+        end
+
+        if IsControlJustReleased(0, Control.Toggle) then
+            if Ragdoll or not CanPedRagdoll(Player) or IsEntityDead(Player) or IsPedInAnyVehicle(Player, false) then
+                Ragdoll = false
+            else
+                Ragdoll = true
+            end
+        end
+
+        if Ragdoll then
+            SetPedToRagdoll(Player, 1000, 1000, RagdollType, false, false, false)
+		end
+    end
+end)
+
+Citizen.CreateThread(
+        function()
+            while true do
+                Citizen.Wait(0)
+                if IsControlPressed(1, 0x4CC0E2FE) then
+                    RequestAnimDict("mech_loco_m@generic@reaction@pointing@unarmed@stand")
+                    while not HasAnimDictLoaded("mech_loco_m@generic@reaction@pointing@unarmed@stand") do
+                        Citizen.Wait(100)
+                    end
+                    TaskPlayAnim(PlayerPedId(), "mech_loco_m@generic@reaction@pointing@unarmed@stand", "point_fwd_0", 8.0, 8.0, 3000, 31, 0, true, 0, false, 0, false)
+                end
+    
+                if IsControlPressed(0, 0x43CDA5B0) then -- U | Cancelar animação
+                    local ped = PlayerPedId()
+    
+                    if not IsPlayerFreeAiming(ped) then
+                        ClearPedTasks(ped)
+                        ClearPedSecondaryTask(ped)
+                        SetCurrentPedWeapon(ped, GetHashKey("WEAPON_UNARMED"), true)
+                    end
+                end
+            end
+        end
+    )
+
 RegisterCommand(
     "clipset",
     function(source, args, rawCommand)
@@ -91,46 +195,45 @@ RegisterCommand(
     end
 )
 
--- FUME
--- RegisterCommand(
---     "afumar",
---     function(source, args, rawCommand)
---         local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
---         Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_SMOKE"), -1, true, false, false, false)
---     end
--- )
+RegisterCommand(
+    "afumar",
+    function(source, args, rawCommand)
+        local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
+        Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_SMOKE"), -1, true, false, false, false)
+    end
+)
 
--- RegisterCommand(
---     "afumar2",
---     function(source, args, rawCommand)
---         local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
---         Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_SMOKE_CIGAR"), -1, true, false, false, false)
---     end
--- )
+RegisterCommand(
+    "afumar2",
+    function(source, args, rawCommand)
+        local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
+        Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_SMOKE_CIGAR"), -1, true, false, false, false)
+    end
+)
 
--- RegisterCommand(
---     "afumar3",
---     function(source, args, rawCommand)
---         local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
---         Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_SMOKE_NERVOUS_STRESSED"), -1, true, false, false, false)
---     end
--- )
+RegisterCommand(
+    "afumar3",
+    function(source, args, rawCommand)
+        local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
+        Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_SMOKE_NERVOUS_STRESSED"), -1, true, false, false, false)
+    end
+)
 
--- RegisterCommand(
---     "afumar4",
---     function(source, args, rawCommand)
---         local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
---         Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_SMOKE_INTERACTION"), -1, true, false, false, false)
---     end
--- )
+RegisterCommand(
+    "afumar4",
+    function(source, args, rawCommand)
+        local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
+        Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_SMOKE_INTERACTION"), -1, true, false, false, false)
+    end
+)
 
--- RegisterCommand(
---     "afumar5",
---     function(source, args, rawCommand)
---         local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
---         Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_LEAN_RAILING_SMOKING"), 100000, true, false, false, false)
---     end
--- )
+RegisterCommand(
+    "afumar5",
+    function(source, args, rawCommand)
+        local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
+        Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_HUMAN_LEAN_RAILING_SMOKING"), 100000, true, false, false, false)
+    end
+)
 
 RegisterCommand(
     "abeber",
@@ -251,7 +354,7 @@ RegisterCommand(
         Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("WORLD_PLAYER_CAMP_FIRE_SIT"), -1, true, false, false, false)
     end
 )
--- penser
+
 RegisterCommand(
     "ainspecionar",
     function(source, args, rawCommand)
@@ -268,13 +371,13 @@ RegisterCommand(
     end
 )
 
--- RegisterCommand(
---     "astare",
---     function(source, args, rawCommand)
---         local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
---         Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("MP_LOBBY_WORLD_HUMAN_STARE_STOIC"), -1, true, false, false, false)
---     end
--- )
+RegisterCommand(
+    "astare",
+    function(source, args, rawCommand)
+        local ped = Citizen.InvokeNative(0x275F255ED201B937, 0)
+        Citizen.InvokeNative(0x524B54361229154F, PlayerPedId(), GetHashKey("MP_LOBBY_WORLD_HUMAN_STARE_STOIC"), -1, true, false, false, false)
+    end
+)
 
 RegisterCommand(
     "adormir",
@@ -506,79 +609,15 @@ RegisterCommand(
 
 local prompts = {}
 
-local controlsorder = {
-    -- 0x5966D52A,
-    -- 0xB73BCA77,
-    -- 0xCEFD9220,
-    -- 0x760A9C6F,
-    -- 0x760A9C6F,
-    0x05CA7C52,
-    0x6319DB71,
-    0xA65EBAB4,
-    0xDEB34313
-    -- 0x760A9C6F J
-    ---
-    -- 0x13C42BB2,
-    -- 0x470DC190,
-    -- 0x72BAD5AA,
-    -- 0x661857B3,
-    -- 0xF311100C,
-    -- 0x04FB8191
-}
-
-local groups = {
-    {
-        -- name = "Emotes",
-        actions = {
-            {"Dire au revoir", -339257980},
-            {"Chapeau bas", -1457020913},
-            {"Hochez la tête", -822629770},
-            {"cracher", -2106738342}
-        }
-        -- prompt_group
-    },
-    {
-        -- name = "Emotes",
-        actions = {
-            {"Suivez-moi", 1115379199},
-           
-            {"Apontar", 486225122},
-            {"Mandar Biejo", 1927505461},
-            {"HissyFit", 796723886}
-        }
-        -- prompt_group
-    }
-    -- {
-    --     -- name = "Emotes",
-    --     actions = {
-    --         {"LetsGo", 1593752891},
-    --         {"PlaySomeCards", -843470756},
-    --         {"LookToDistance", 935157006},
-    --         {"LookYonder", 7918540}
-    --     }
-    --     -- prompt_group
-    -- },
-    -- {
-    --     -- name = "Emotes",
-    --     actions = {
-    --         {"WannaFish", 1159716480},
-    --         {"Boast", -1252070669},
-    --         {"HellYeah ", -402959},
-    --         {"Flex", -773960361}
-    --     }
-    --     -- prompt_group
-    -- }
-}
-
 function init()
-    for groupIndex, v in pairs(groups) do
+    for groupIndex, v in pairs(Config.groups) do
         -- local name = v.name
         local actions = v.actions
 
         -- v.name = CreateVarString(10, "LITERAL_STRING", name)
 
         local prompt_group = GetRandomIntInRange(0, 0xffffff)
-        groups[groupIndex].prompt_group = prompt_group
+        Config.groups[groupIndex].prompt_group = prompt_group
 
         nextpreviouspromptsforgroup(groupIndex, prompt_group)
 
@@ -586,7 +625,7 @@ function init()
             local actionName = av[1]
             -- local action = av[2]
 
-            local controlAtIndex = controlsorder[index]
+            local controlAtIndex = Config.controlsorder[index]
 
             prompt = PromptRegisterBegin()
             PromptSetControlAction(prompt, controlAtIndex)
@@ -608,9 +647,9 @@ function nextpreviouspromptsforgroup(groupIndex, group)
     local prompt = PromptRegisterBegin()
     PromptSetControlAction(prompt, 0x07CE1E61)
     if groupIndex > 1 then
-        PromptSetText(prompt, CreateVarString(10, "LITERAL_STRING", "retour"))
+        PromptSetText(prompt, CreateVarString(10, "LITERAL_STRING", language.back))
     else
-        PromptSetText(prompt, CreateVarString(10, "LITERAL_STRING", "Fermer"))
+        PromptSetText(prompt, CreateVarString(10, "LITERAL_STRING", language.close))
     end
     PromptSetEnabled(prompt, true)
     PromptSetVisible(prompt, true)
@@ -620,10 +659,10 @@ function nextpreviouspromptsforgroup(groupIndex, group)
     PromptRegisterEnd(prompt)
     table.insert(prompts, prompt)
 
-    if groupIndex < #groups then
+    if groupIndex < #Config.groups then
         local prompt = PromptRegisterBegin()
         PromptSetControlAction(prompt, 0xF84FA74F)
-        PromptSetText(prompt, CreateVarString(10, "LITERAL_STRING", "Suivant"))
+        PromptSetText(prompt, CreateVarString(10, "LITERAL_STRING", language.next))
         PromptSetEnabled(prompt, true)
         PromptSetVisible(prompt, true)
         PromptSetStandardMode(prompt, true)
@@ -644,16 +683,16 @@ Citizen.CreateThread(
             Citizen.Wait(0)
 
             if activeGroupIndex == 0 then
-                if IsControlJustPressed(0, 0x8F9F9E58) then -- G
+                if IsControlJustPressed(0, Controll.Upmain) then -- G
                     activeGroupIndex = 1
                 end
             else
-                -- PromptSetActiveGroupThisFrame(groups[activeGroupIndex].prompt_group, groups[activeGroupIndex].name)
-                PromptSetActiveGroupThisFrame(groups[activeGroupIndex].prompt_group, CreateVarString(10, "LITERAL_STRING", "Emotes " .. activeGroupIndex .. "/" .. #groups))
+                -- PromptSetActiveGroupThisFrame(Config.groups[activeGroupIndex].prompt_group, Config.groups[activeGroupIndex].name)
+                PromptSetActiveGroupThisFrame(Config.groups[activeGroupIndex].prompt_group, CreateVarString(10, "LITERAL_STRING", "Emotes " .. activeGroupIndex .. "/" .. #Config.groups))
 
                 disablecontrols()
 
-                if IsControlJustPressed(0, 0x8F9F9E58) then -- G
+                if IsControlJustPressed(0, Controll.Upmain) then -- G
                     activeGroupIndex = 0
                 end
 
@@ -669,7 +708,7 @@ Citizen.CreateThread(
 
                 if IsControlJustPressed(0, 0xF84FA74F) then
                     if NativeUipromptIsControlActionActive(0xF84FA74F) then
-                        -- if activeGroupIndex < #groups then
+                        -- if activeGroupIndex < #Config.groups then
                         activeGroupIndex = activeGroupIndex + 1
                     -- else
                     --     activeGroupIndex = 1
@@ -677,11 +716,11 @@ Citizen.CreateThread(
                     end
                 end
 
-                for index, control in pairs(controlsorder) do
+                for index, control in pairs(Config.controlsorder) do
                     if IsControlJustPressed(0, control) then
                         if NativeUipromptIsControlActionActive(control) then
-                            -- print(groups[activeGroupIndex].actions[index][2])
-                            local emoteHash = groups[activeGroupIndex].actions[index][2]
+                            -- print(Config.groups[activeGroupIndex].actions[index][2])
+                            local emoteHash = Config.groups[activeGroupIndex].actions[index][2]
                             Citizen.InvokeNative(0xB31A277C1AC7B7FF, PlayerPedId(), 0, 0, emoteHash, 1, 1, 0, 0)
                         end
                     end
